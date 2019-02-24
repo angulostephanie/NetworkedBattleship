@@ -1,4 +1,5 @@
 import java.net.*;
+import java.util.Arrays; 
 
 public class Game {
 	Socket player1;
@@ -12,13 +13,5 @@ public class Game {
 	void start() {
 		System.out.println("Both players are here, let's start!");
 	}
-
-}
-
-class Player {
-	
-}
-
-class Ship {
 
 }
