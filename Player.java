@@ -1,21 +1,32 @@
 import java.lang.Math;
-import java.util.Arrays; 
-import java.util.List; 
-import java.util.Scanner;
+import java.net.*;
+import java.io.*;
+import java.util.*;
 import java.util.stream.Collectors;
 
-class Player {
+public class Player {
+
 	public static int BOARD_SIZE = 10;
 	
 	int[][] board;
 	int[][] otherBoard;
 	int numAlive;
+	Socket socket;
+	PrintWriter out;
+	BufferedReader in;
 
 
-	Player() {
+	public Player(Socket socket) {
+		try{
+		this.socket = socket;
+		this.out = new PrintWriter(socket.getOutputStream(), true);
+		this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		this.board = initializeBoard();
 		this.otherBoard = initializeBoard();
 		this.numAlive = 0;
+		} catch (IOException io){
+			System.out.println(io);
+		}
 	}
 	
 	int[][] initializeBoard() {
@@ -83,9 +94,9 @@ class Player {
 		return board[x][y] == 0;
 	}
 
-	boolean isSpaceAvailable() {
+	/*boolean isSpaceAvailable() {
 
-	}
+	}*/
 
 	boolean withinBounds(int x, int y) {
 		return x >= 0 && x < BOARD_SIZE && y >=0 && y < BOARD_SIZE;

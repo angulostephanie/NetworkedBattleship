@@ -1,17 +1,21 @@
 import java.net.*;
 import java.util.Arrays; 
 
-public class Game {
-	Socket player1;
-	Socket player2;
+public class Game{
+	Player player1;
+	Player player2;
 
-	Game(Socket player1, Socket player2) {
-		this.player1 = player1;
-		this.player2 = player2;
+	Game(Socket socket1, Socket socket2) {
+		this.player1 = new Player(socket1);
+		this.player2 = new Player(socket2);
 	}
 
 	void start() {
-		System.out.println("Both players are here, let's start!");
+		String WELCOME_MSG = "Both players are here, let's start!";
+		System.out.println(WELCOME_MSG);
+		player1.out.println(WELCOME_MSG);
+		player2.out.println(WELCOME_MSG);
+
 	}
 
 }
