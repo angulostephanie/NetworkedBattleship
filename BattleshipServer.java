@@ -17,6 +17,7 @@ public class BattleshipServer {
                 if(players.size() == 2) {
                     Game game = new Game(players.get(0), players.get(1));
                     game.start();
+                    players.clear();
                 }
             }
         } catch (IOException e) {
