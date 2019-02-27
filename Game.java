@@ -2,7 +2,7 @@ import java.io.IOException;
 import java.net.*;
 import java.util.Arrays; 
 
-public class Game{
+public class Game {
 	Player player1;
 	Player player2;
 
@@ -19,8 +19,8 @@ public class Game{
 	
 	static void setUpShips(Player player1, Player player2){
 		try{
-			AddShipThread t1 = new AddShipThread(player1);
-			AddShipThread t2 = new AddShipThread(player2);
+			SetupBoard t1 = new SetupBoard(player1);
+			SetupBoard t2 = new SetupBoard(player2);
 			t1.start();
 			t2.start();
 			t1.join();
@@ -31,20 +31,21 @@ public class Game{
 	}
 }
 
-class AddShipThread extends Thread{
+class SetupBoard extends Thread {
 	Player player;
-	int MAX_NUM_SHIPS = 3;
 
-	public AddShipThread(Player player){
+	public SetupBoard(Player player){
 		this.player = player;
 	}
 
 	public void run(){
 		int count = 0;
-		while(count < MAX_NUM_SHIPS){
+		while(count < Constants.MAX_NUM_SHIPS){
 			if(player.addShip())
 				count++;
 		}
-		player.out.println("You have finished adding your ships");
+		player.out.println(Constants.FINISHED_ADD_MSG);
+		player.out.println(Constants.DIPLAY_BOARD_MSG);
+		player.printBoard();
 	}
 }

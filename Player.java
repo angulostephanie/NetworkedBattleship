@@ -95,7 +95,7 @@ public class Player {
 		} 
 
 		int distance = isHorizontal ? Math.abs(y0 - y1) : Math.abs(x0 - x1);
-		out.println("distance is " + distance);
+		
 		if(ships.containsKey(distance)) {
 			if(ships.get(distance) == 1) {
 				out.println(Constants.ERR_MSG_ALREADY_USED(distance + 1));
@@ -135,6 +135,7 @@ public class Player {
 		} 
 
 		ships.put(distance, 1);
+		out.println(Constants.ADD_SHIP_MSG(distance + 1));
 		return true;
 	}
 
@@ -149,6 +150,8 @@ public class Player {
 
 
 	void printBoard() {
-		out.println(Arrays.deepToString(this.board));
+		for(int[] row : this.board) {
+			out.println(Arrays.toString(row));
+		}
 	}
 }
