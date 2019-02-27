@@ -62,6 +62,7 @@ public class BattleshipClient {
                 
             } catch(IOException e){
                 System.out.println(e);
+                System.exit(1);
             }
             
         }

@@ -35,6 +35,7 @@ public class Game{
 
 class AddShipThread extends Thread{
 	Player player;
+	int MAX_NUM_SHIPS = 4;
 
 	public AddShipThread(Player player){
 		this.player = player;
@@ -42,9 +43,9 @@ class AddShipThread extends Thread{
 
 	public void run(){
 		int count = 0;
-		while(count < 4){
-			player.addShip();
-			count++;
+		while(count < MAX_NUM_SHIPS){
+			if(player.addShip())
+				count++;
 		}
 		player.out.println("You have finished adding your ships");
 	}
