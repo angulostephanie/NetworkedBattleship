@@ -12,10 +12,8 @@ public class Game{
 	}
 
 	void start() {
-		String WELCOME_MSG = "Both players are here, let's start!";
-		System.out.println(WELCOME_MSG);
-		player1.out.println(WELCOME_MSG);
-		player2.out.println(WELCOME_MSG);
+		player1.out.println(Constants.WELCOME_MSG);
+		player2.out.println(Constants.WELCOME_MSG);
 		setUpShips(player1, player2);
 	}
 	
@@ -35,7 +33,7 @@ public class Game{
 
 class AddShipThread extends Thread{
 	Player player;
-	int MAX_NUM_SHIPS = 4;
+	int MAX_NUM_SHIPS = 3;
 
 	public AddShipThread(Player player){
 		this.player = player;

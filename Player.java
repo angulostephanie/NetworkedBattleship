@@ -5,16 +5,20 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class Player {
-
-	public static int BOARD_SIZE = 10;
 	
 	int[][] board;
 	int[][] otherBoard;
 	int numAlive;
+
+	Map<Integer, Integer> ships = new HashMap<Integer, Integer>() {{
+        put(Constants.SMALL_SHIP,0);
+        put(Constants.AVG_SHIP,0);
+        put(Constants.BIG_SHIP,0);
+    }};
+
 	Socket socket;
 	PrintWriter out;
 	BufferedReader in;
-
 
 	// for testing purposes aka Tester.java
 	public Player() {
@@ -24,30 +28,32 @@ public class Player {
 	}
 
 	public Player(Socket socket) {
-		try{
-		this.socket = socket;
-		this.out = new PrintWriter(socket.getOutputStream(), true);
-		this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		this.board = initializeBoard();
-		this.otherBoard = initializeBoard();
-		this.numAlive = 0;
+		try {
+			this.socket = socket;
+			this.out = new PrintWriter(socket.getOutputStream(), true);
+			this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+			this.board = initializeBoard();
+			this.otherBoard = initializeBoard();
+			this.numAlive = 0;
+			
 		} catch (IOException io){
 			System.out.println(io);
 		}
 	}
 	
 	int[][] initializeBoard() {
-		int[][] emptyBoard = new int[BOARD_SIZE][BOARD_SIZE];
+		int[][] emptyBoard = new int[Constants.BOARD_SIZE][Constants.BOARD_SIZE];
 		for (int[] row : emptyBoard) 
             Arrays.fill(row, 0); 
         return emptyBoard;
 	}
 
 	boolean addShip() {
-		out.println("Format to place a ship on the board is: ");
-		out.println("x0, y0, x1, y1");
+		out.println(Constants.FORMAT_MSG_1);
+		out.println(Constants.FORMAT_MSG_2);
+		
 		String input = null;
-		try{
+		try {
 			while(true){
 				if((input = in.readLine()) != null){
 					break;
@@ -56,14 +62,17 @@ public class Player {
 		} catch(IOException io){
 			System.out.println(io);
 		}
-		
-		//Scanner sc = new Scanner(System.in);
-		//String input = sc.nextLine();
+
+		/*
+		Scanner sc = new Scanner(System.in);
+		String input = sc.nextLine();
+		*/
+
 		List<String> list = Arrays.asList(input.split(","));
 		List<Integer> nums = list.stream().map(Integer::parseInt).collect(Collectors.toList());
 
 		if(nums.size() != 4) {
-			out.println("please enter 4 numbers");
+			out.println(Constants.ERR_MSG_SIZE);
 			out.println();
 			return false;
 		} 
@@ -76,58 +85,56 @@ public class Player {
 		boolean isVertical = y0 == y1;
 
 		if(!withinBounds(x0, y0) && !withinBounds(x1, y1)) {
-			out.println("coordinates out of bounds, try again");
+			out.println(Constants.ERR_MSG_BOUNDS);
 			out.println();
 			return false;
 		} else if(!isHorizontal && !isVertical) {
-			out.println("ships must be horizontal or vertical, try again");
+			out.println(Constants.ERR_MSG_ORIENTATION);
 			out.println();
 			return false;
 		} 
 
-		if(isHorizontal) {
-			int distance = Math.abs(y0 - y1);
-			if(distance >= 2 && distance < 4) {
-				int small = y0 < y1 ? y0 : y1;
-				int big = y0 < y1 ? y1 : y0;
-				for(int i = small; i <= big; i++) {
-					if(!isAvailable(x0, i)) {
-						out.println("already have a ship in this range, try again");
-						out.println();
-						return false;
-					}
-				}
-
-				for(int i = small; i <= big; i++) {
-					if(isAvailable(x0, i)) {
-						this.board[x0][i] = 1;
-					}
-				}
-			}  
+		int distance = isHorizontal ? Math.abs(y0 - y1) : Math.abs(x0 - x1);
+		out.println("distance is " + distance);
+		if(ships.containsKey(distance)) {
+			if(ships.get(distance) == 1) {
+				out.println(Constants.ERR_MSG_ALREADY_USED(distance + 1));
+				out.println();
+				return false;
+			} 
 		} else {
-			int distance = Math.abs(x0 - x1);
-			System.out.println("distance " + distance);
-			if(distance >= 2 && distance < 4) {
-				int small = x0 < x1 ? x0 : x1;
-				int big = x0 < x1 ? x1 : x0;
-
-				for(int i = small; i <= big; i++) {
-					if(!isAvailable(i, y0)) {
-						out.println("already have a ship in this range, try again");
-						out.println();
-						return false;
-					}
-				}
-
-				for(int i = small; i <= big; i++) {
-					if(isAvailable(i, y0)) {
-						this.board[i][y0] = 1;
-					}
-				}
-			}  
+			out.println(Constants.ERR_MSG_LENGTH);
+			out.println();
+			return false;
 		}
 
-		System.out.println(Arrays.toString(nums.toArray()));
+
+		int small = isHorizontal ? (y0 < y1 ? y0 : y1) : (x0 < x1 ? x0 : x1);
+		int big = isHorizontal ? (y0 < y1 ? y1 : y0) : (x0 < x1 ? x1 : x0);
+		int c = isHorizontal ? x0 : y0;
+
+		// check if this range is unoccupied first.
+		for(int i = small; i <= big; i++) {
+			if(isHorizontal && !isAvailable(c, i)) {
+				out.println(Constants.ERR_MSG_UNAVAILABLE);
+				out.println();
+				return false;
+			} else if(isVertical && !isAvailable(i, c)) {
+				out.println(Constants.ERR_MSG_UNAVAILABLE);
+				out.println();
+				return false;
+			}
+		}
+
+		for(int i = small; i <= big; i++) {
+			if(isHorizontal && isAvailable(c, i)) {
+				this.board[c][i] = 1;
+			} else if(isVertical && isAvailable(i, c)) {
+				this.board[i][c] = 1;
+			}
+		} 
+
+		ships.put(distance, 1);
 		return true;
 	}
 
@@ -136,15 +143,12 @@ public class Player {
 		return board[x][y] == 0;
 	}
 
-	/*boolean isSpaceAvailable() {
-
-	}*/
-
 	boolean withinBounds(int x, int y) {
-		return x >= 0 && x < BOARD_SIZE && y >=0 && y < BOARD_SIZE;
+		return x >= 0 && x < Constants.BOARD_SIZE && y >=0 && y < Constants.BOARD_SIZE;
 	}
 
+
 	void printBoard() {
-		out.println(Arrays.deepToString(board));
+		out.println(Arrays.deepToString(this.board));
 	}
 }
