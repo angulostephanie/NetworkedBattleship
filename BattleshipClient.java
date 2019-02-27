@@ -1,5 +1,6 @@
 import java.net.*;
 
+
 import org.w3c.dom.ls.LSException;
 
 import java.io.*;
@@ -15,21 +16,31 @@ public class BattleshipClient {
 		String hostName = args[0]; 
 
 		try {
-            Socket clientSocket = new Socket(hostName, 12345); 
-            ClientThread client = new ClientThread(clientSocket);
-            client.start();
+            String userInput;
+            Socket socket = new Socket(hostName, 12345); 
+            PrintWriter out =
+                    new PrintWriter(socket.getOutputStream(), true); 
+                BufferedReader stdIn =
+                    new BufferedReader(
+                        new InputStreamReader(System.in)); 
+                BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            ServerListener listener = new ServerListener(socket);
+            listener.start();
+            System.out.println("Welcome to a game of Battleship!");
+
+            while((userInput = stdIn.readLine()) != null){
+                out.println(userInput);
+            }
         } catch (UnknownHostException e) {
             System.err.println("Don't know about host " + hostName);
             System.exit(1);
         } 
     }
     
-    static class ClientThread extends Thread{
+    static class ServerListener extends Thread{
         Socket socket;
-        PrintWriter out;
-        BufferedReader in;
 
-        public ClientThread(Socket socket){
+        public ServerListener(Socket socket){
             this.socket = socket;
         }
         
@@ -42,12 +53,13 @@ public class BattleshipClient {
                     new BufferedReader(
                         new InputStreamReader(System.in)); 
                 BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-        	    System.out.println("Welcome to a game of Battleship!");
-
-                String incomingMsg;
-                while ((incomingMsg = in.readLine()) != null) { 
-		 		System.out.println(incomingMsg);
-		 	}
+                
+                String serverInput;
+                while((serverInput = in.readLine()) != null){
+                    System.out.println(serverInput);
+                }
+    
+                
             } catch(IOException e){
                 System.out.println(e);
             }

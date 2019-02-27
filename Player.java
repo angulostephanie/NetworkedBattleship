@@ -44,16 +44,27 @@ public class Player {
 	}
 
 	boolean addShip() {
-		System.out.println("Format to place a ship on the board is: ");
-		System.out.println("x0, y0, x1, y1");
-		Scanner sc = new Scanner(System.in);
-		String input = sc.nextLine();
+		out.println("Format to place a ship on the board is: ");
+		out.println("x0, y0, x1, y1");
+		String input = null;
+		try{
+			while(true){
+				if((input = in.readLine()) != null){
+					break;
+				}
+			}
+		} catch(IOException io){
+			System.out.println(io);
+		}
+		
+		//Scanner sc = new Scanner(System.in);
+		//String input = sc.nextLine();
 		List<String> list = Arrays.asList(input.split(","));
 		List<Integer> nums = list.stream().map(Integer::parseInt).collect(Collectors.toList());
 
 		if(nums.size() != 4) {
-			System.out.println("please enter 4 numbers");
-			System.out.println();
+			out.println("please enter 4 numbers");
+			out.println();
 			return false;
 		} 
 
@@ -65,12 +76,12 @@ public class Player {
 		boolean isVertical = y0 == y1;
 
 		if(!withinBounds(x0, y0) && !withinBounds(x1, y1)) {
-			System.out.println("coordinates out of bounds, try again");
-			System.out.println();
+			out.println("coordinates out of bounds, try again");
+			out.println();
 			return false;
 		} else if(!isHorizontal && !isVertical) {
-			System.out.println("ships must be horizontal or vertical, try again");
-			System.out.println();
+			out.println("ships must be horizontal or vertical, try again");
+			out.println();
 			return false;
 		} 
 
@@ -81,8 +92,8 @@ public class Player {
 				int big = y0 < y1 ? y1 : y0;
 				for(int i = small; i <= big; i++) {
 					if(!isAvailable(x0, i)) {
-						System.out.println("already have a ship in this range, try again");
-						System.out.println();
+						out.println("already have a ship in this range, try again");
+						out.println();
 						return false;
 					}
 				}
@@ -102,8 +113,8 @@ public class Player {
 
 				for(int i = small; i <= big; i++) {
 					if(!isAvailable(i, y0)) {
-						System.out.println("already have a ship in this range, try again");
-						System.out.println();
+						out.println("already have a ship in this range, try again");
+						out.println();
 						return false;
 					}
 				}
@@ -134,6 +145,6 @@ public class Player {
 	}
 
 	void printBoard() {
-		System.out.println(Arrays.deepToString(board));
+		out.println(Arrays.deepToString(board));
 	}
 }
