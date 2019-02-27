@@ -4,7 +4,15 @@ public class Tester {
 		test.printBoard();
 		System.out.println();
 		System.out.println();
-		test.addShip();
+		int count = 0;
+		while(count < 3) {
+			boolean canAddShip = test.addShip();
+			test.printBoard();
+			if(canAddShip) {
+				count++;
+			}
+		}
+		//test.addShip();
 		System.out.println();
 		test.printBoard();
 	}

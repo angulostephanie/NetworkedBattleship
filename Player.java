@@ -16,6 +16,13 @@ public class Player {
 	BufferedReader in;
 
 
+	// for testing purposes aka Tester.java
+	public Player() {
+		this.board = initializeBoard();
+		this.otherBoard = initializeBoard();
+		this.numAlive = 0;
+	}
+
 	public Player(Socket socket) {
 		try{
 		this.socket = socket;
@@ -69,21 +76,45 @@ public class Player {
 
 		if(isHorizontal) {
 			int distance = Math.abs(y0 - y1);
-			System.out.println("distance " + distance);
-			if(distance >= 2 && distance <=4) {
-				System.out.println("y0 " + y0);
-				System.out.println("y1 " + y1);
-				for(int i = y0; i <= y1; i++) {
+			if(distance >= 2 && distance < 4) {
+				int small = y0 < y1 ? y0 : y1;
+				int big = y0 < y1 ? y1 : y0;
+				for(int i = small; i <= big; i++) {
+					if(!isAvailable(x0, i)) {
+						System.out.println("already have a ship in this range, try again");
+						System.out.println();
+						return false;
+					}
+				}
+
+				for(int i = small; i <= big; i++) {
 					if(isAvailable(x0, i)) {
-						System.out.println("yup");
 						this.board[x0][i] = 1;
 					}
 				}
 			}  
+		} else {
+			int distance = Math.abs(x0 - x1);
+			System.out.println("distance " + distance);
+			if(distance >= 2 && distance < 4) {
+				int small = x0 < x1 ? x0 : x1;
+				int big = x0 < x1 ? x1 : x0;
 
-		} 
+				for(int i = small; i <= big; i++) {
+					if(!isAvailable(i, y0)) {
+						System.out.println("already have a ship in this range, try again");
+						System.out.println();
+						return false;
+					}
+				}
 
-
+				for(int i = small; i <= big; i++) {
+					if(isAvailable(i, y0)) {
+						this.board[i][y0] = 1;
+					}
+				}
+			}  
+		}
 
 		System.out.println(Arrays.toString(nums.toArray()));
 		return true;
