@@ -7,8 +7,13 @@ import java.util.stream.Collectors;
 public class Player {
 	
 	int[][] board;
-	int[][] otherBoard;
-	int numAlive;
+	// 0 =  empty/nothing
+	// 1 = ship is present and alive
+	// -1 = other player hit ship
+	// 2 the other player shot and missed
+
+	int numAlive; 
+	// needs to update when other player hits ship 
 
 	Map<Integer, Integer> ships = new HashMap<Integer, Integer>() {{
         put(Constants.SMALL_SHIP,0);
@@ -23,7 +28,6 @@ public class Player {
 	// for testing purposes aka Tester.java
 	public Player() {
 		this.board = initializeBoard();
-		this.otherBoard = initializeBoard();
 		this.numAlive = 0;
 	}
 
@@ -33,7 +37,6 @@ public class Player {
 			this.out = new PrintWriter(socket.getOutputStream(), true);
 			this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			this.board = initializeBoard();
-			this.otherBoard = initializeBoard();
 			this.numAlive = 0;
 			
 		} catch (IOException io){
@@ -41,11 +44,8 @@ public class Player {
 		}
 	}
 	
-	int[][] initializeBoard() {
-		int[][] emptyBoard = new int[Constants.BOARD_SIZE][Constants.BOARD_SIZE];
-		for (int[] row : emptyBoard) 
-            Arrays.fill(row, 0); 
-        return emptyBoard;
+	void takeTurn() {
+		// logic
 	}
 
 	boolean addShip() {
@@ -129,8 +129,10 @@ public class Player {
 		for(int i = small; i <= big; i++) {
 			if(isHorizontal && isAvailable(c, i)) {
 				this.board[c][i] = 1;
+				this.numAlive++;
 			} else if(isVertical && isAvailable(i, c)) {
 				this.board[i][c] = 1;
+				this.numAlive++;
 			}
 		} 
 
@@ -140,6 +142,21 @@ public class Player {
 	}
 
 
+	// Helper functions
+
+	int[][] initializeBoard() {
+		int[][] emptyBoard = new int[Constants.BOARD_SIZE][Constants.BOARD_SIZE];
+		for (int[] row : emptyBoard) 
+            Arrays.fill(row, 0); 
+        return emptyBoard;
+	}
+
+	void printBoard() {
+		for(int[] row : this.board) {
+			out.println(Arrays.toString(row));
+		}
+	}
+
 	boolean isAvailable(int x, int y) {
 		return board[x][y] == 0;
 	}
@@ -148,10 +165,7 @@ public class Player {
 		return x >= 0 && x < Constants.BOARD_SIZE && y >=0 && y < Constants.BOARD_SIZE;
 	}
 
-
-	void printBoard() {
-		for(int[] row : this.board) {
-			out.println(Arrays.toString(row));
-		}
+	boolean hasAnAliveShip() {
+		return this.numsAlive > 0;
 	}
 }

@@ -15,10 +15,20 @@ public class Game {
 		player1.out.println(Constants.WELCOME_MSG);
 		player2.out.println(Constants.WELCOME_MSG);
 		setUpShips(player1, player2);
+
+		// time to take turns
+		// while loop 
+		// conditional --> until one player loses
+
+		/*
+		while(player1.hasAnAliveShip || player2.hasAnAliveShip) {
+			
+		}
+		*/
 	}
 	
 	static void setUpShips(Player player1, Player player2){
-		try{
+		try {
 			SetupBoard t1 = new SetupBoard(player1);
 			SetupBoard t2 = new SetupBoard(player2);
 			t1.start();
