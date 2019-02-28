@@ -6,30 +6,16 @@ import java.util.stream.Collectors;
 
 public class Player {
 	
-	int[][] board;
-	// 0 =  empty/nothing
-	// 1 = ship is present and alive
-	// -1 = other player hit ship
-	// 2 the other player shot and missed
-
-	int numAlive; 
-	// needs to update when other player hits ship 
-
-	Map<Integer, Integer> ships = new HashMap<Integer, Integer>() {{
-        put(Constants.SMALL_SHIP,0);
-        put(Constants.AVG_SHIP,0);
-        put(Constants.BIG_SHIP,0);
-    }};
-
 	Socket socket;
 	PrintWriter out;
 	BufferedReader in;
 
-	// for testing purposes aka Tester.java
-	public Player() {
-		this.board = initializeBoard();
-		this.numAlive = 0;
-	}
+	Map<Integer, ArrayList<String>> shipToCoordinates;
+	Map<String, Integer> coordinatesToShipType;
+
+	int[][] board;
+
+	int numAlive; 
 
 	public Player(Socket socket) {
 		try {
@@ -37,6 +23,8 @@ public class Player {
 			this.out = new PrintWriter(socket.getOutputStream(), true);
 			this.in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 			this.board = initializeBoard();
+			this.shipToCoordinates = initializeCoordinatesMap();
+			this.coordinatesToShipType = new HashMap<String, Integer>();
 			this.numAlive = 0;
 			
 		} catch (IOException io){
@@ -44,35 +32,68 @@ public class Player {
 		}
 	}
 	
-	void takeTurn() {
+	void takeTurn(Player opponent) {
+		out.println(Constants.YOUR_TURN_MSG);
+		out.println(Constants.FORMAT_MSG_3);
+
+		String input = null;
+		try {
+			while(true) {
+				if((input = in.readLine()) != null) {
+					break;
+				}
+			}
+		} catch(IOException io) {
+			System.out.println(io);
+		}
+
+		List<String> list = Arrays.asList(input.split(","));
+		List<Integer> nums = list.stream().map(Integer::parseInt).collect(Collectors.toList());
+
+		if(nums.size() != 2) {
+			out.println(Constants.ERR_MSG_SIZE(2));
+			out.println();
+		} 
+
+		int x = nums.get(0);
+		int y = nums.get(1);
+
+		if(!withinBounds(x, y)) {
+			out.println(Constants.ERR_MSG_BOUNDS);
+			out.println();
+		}
+		// check if this player has already shot at this location
+		// if player hasn't, check if value is 1 or 0.
+		// update the other player's board accordingly
+		// update other player's numAlive and shipToCoordinates map
+		// probably dont need numAlive anymore, now that i'm thinking about it
 		// logic
 	}
 
+	void updateBoard(int x, int y, int value) {
+		this.board[x][y] = value;
+	}
 	boolean addShip() {
 		out.println(Constants.FORMAT_MSG_1);
 		out.println(Constants.FORMAT_MSG_2);
 		
 		String input = null;
 		try {
-			while(true){
+			while(true) {
 				if((input = in.readLine()) != null){
 					break;
 				}
 			}
-		} catch(IOException io){
+		} catch(IOException io) {
 			System.out.println(io);
 		}
 
-		/*
-		Scanner sc = new Scanner(System.in);
-		String input = sc.nextLine();
-		*/
 
 		List<String> list = Arrays.asList(input.split(","));
 		List<Integer> nums = list.stream().map(Integer::parseInt).collect(Collectors.toList());
 
 		if(nums.size() != 4) {
-			out.println(Constants.ERR_MSG_SIZE);
+			out.println(Constants.ERR_MSG_SIZE(4));
 			out.println();
 			return false;
 		} 
@@ -96,8 +117,8 @@ public class Player {
 
 		int distance = isHorizontal ? Math.abs(y0 - y1) : Math.abs(x0 - x1);
 		
-		if(ships.containsKey(distance)) {
-			if(ships.get(distance) == 1) {
+		if(shipToCoordinates.containsKey(distance)) {
+			if(!shipToCoordinates.get(distance).isEmpty()) {
 				out.println(Constants.ERR_MSG_ALREADY_USED(distance + 1));
 				out.println();
 				return false;
@@ -126,17 +147,20 @@ public class Player {
 			}
 		}
 
+		ArrayList<String> coordinates = new ArrayList<>();
 		for(int i = small; i <= big; i++) {
 			if(isHorizontal && isAvailable(c, i)) {
-				this.board[c][i] = 1;
+				this.board[c][i] = Constants.SHIP_POS;
 				this.numAlive++;
+				coordinates.add(c + "," + i);
 			} else if(isVertical && isAvailable(i, c)) {
-				this.board[i][c] = 1;
+				this.board[i][c] = Constants.SHIP_POS;
 				this.numAlive++;
+				coordinates.add(i + "," + c);
 			}
 		} 
-
-		ships.put(distance, 1);
+		
+		shipToCoordinates.put(distance, coordinates);
 		out.println(Constants.ADD_SHIP_MSG(distance + 1));
 		return true;
 	}
@@ -147,8 +171,17 @@ public class Player {
 	int[][] initializeBoard() {
 		int[][] emptyBoard = new int[Constants.BOARD_SIZE][Constants.BOARD_SIZE];
 		for (int[] row : emptyBoard) 
-            Arrays.fill(row, 0); 
+            Arrays.fill(row, Constants.EMPTY_POS); 
         return emptyBoard;
+	}
+
+	Map<Integer, ArrayList<String>> initializeCoordinatesMap() {
+		Map<Integer, ArrayList<String>> emptyMap = new HashMap<Integer, ArrayList<String>>() {{
+	        put(Constants.SMALL_SHIP, new ArrayList<String>());
+	        put(Constants.AVG_SHIP, new ArrayList<String>());
+	        put(Constants.BIG_SHIP,new ArrayList<String>());
+	    }};
+	    return emptyMap;
 	}
 
 	void printBoard() {
@@ -165,7 +198,7 @@ public class Player {
 		return x >= 0 && x < Constants.BOARD_SIZE && y >=0 && y < Constants.BOARD_SIZE;
 	}
 
-	boolean hasAnAliveShip() {
-		return this.numsAlive > 0;
+	boolean lost() {
+		return this.numAlive == 0;
 	}
 }

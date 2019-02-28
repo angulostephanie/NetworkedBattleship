@@ -14,17 +14,17 @@ public class Game {
 	void start() {
 		player1.out.println(Constants.WELCOME_MSG);
 		player2.out.println(Constants.WELCOME_MSG);
+
 		setUpShips(player1, player2);
 
-		// time to take turns
-		// while loop 
-		// conditional --> until one player loses
+		boolean gameOver = player1.lost() || player1.lost();
 
-		/*
-		while(player1.hasAnAliveShip || player2.hasAnAliveShip) {
-			
+		while(!gameOver) {
+			player1.takeTurn(player2);
+			if(gameOver) break; // add logic who won after while loop
+			player2.takeTurn(player1);
 		}
-		*/
+
 	}
 	
 	static void setUpShips(Player player1, Player player2){
