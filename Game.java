@@ -20,9 +20,17 @@ public class Game {
 		boolean gameOver = player1.lost() || player1.lost();
 
 		while(!gameOver) {
+			try{
+			broadcastMSG(player2, Constants.OTHER_PLAYER_TURN_MSG(1));
 			player1.takeTurn(player2);
+			Thread.sleep(1000);
 			if(gameOver) break; // add logic who won after while loop
+			broadcastMSG(player1, Constants.OTHER_PLAYER_TURN_MSG(2));
 			player2.takeTurn(player1);
+			Thread.sleep(1000);
+			} catch(InterruptedException ie){
+				System.out.println(ie);
+			}
 		}
 
 	}
@@ -38,6 +46,10 @@ public class Game {
 		}  catch(InterruptedException ie){
 			System.out.println(ie);
 		}
+	}
+
+	void broadcastMSG(Player msgReceiver, String message){
+		msgReceiver.out.println(message);
 	}
 }
 
@@ -55,7 +67,7 @@ class SetupBoard extends Thread {
 				count++;
 		}
 		player.out.println(Constants.FINISHED_ADD_MSG);
-		player.out.println(Constants.DIPLAY_BOARD_MSG);
+		player.out.println(Constants.DISPLAY_BOARD_MSG);
 		player.printBoard();
 	}
 }

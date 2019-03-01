@@ -17,12 +17,20 @@ public class Constants {
 	static String FORMAT_MSG_1 = "Format to place a ship on the board is: ";
 	static String FORMAT_MSG_2 = "x0, y0, x1, y1";
 	static String FORMAT_MSG_3 = "x, y";
-	static String DIPLAY_BOARD_MSG = "This is what your board looks like: ";
+	static String DISPLAY_BOARD_MSG = "This is what your board looks like: ";
 	static String FINISHED_ADD_MSG = "You have finished adding your ships! Waiting for the other player to finish..";
 	static String YOUR_TURN_MSG = "Your turn! Enter in x and y coordinates to shoot down your opponent's ship! Format: ";
+	static String MISSED_SHOT_MSG = "Oops! You missed.";
+	static String MISSED_SHOT_UPDATE_MSG = "Phew! Your opponent shot and missed.";
+	static String HIT_SHOT_MSG = "You hit a ship!";
+	static String HIT_SHOT_UPDATE_MSG = "Agh! You've been hit by your opponent.";
 	
 	static String ADD_SHIP_MSG(int distance) {
 		return "Just added a ship of unit size " + (distance) + ".";
+	}
+
+	static String OTHER_PLAYER_TURN_MSG(int playerNum){
+		return "It is Player " + (playerNum) + "'s turn. Please wait...";
 	}
 
 	// Error Messages
@@ -30,6 +38,7 @@ public class Constants {
 	static String ERR_MSG_ORIENTATION = "Ships must be either horizontal or vertical, try again.";
 	static String ERR_MSG_LENGTH = "Ship must be within 2 - 4 units long, try again";
 	static String ERR_MSG_UNAVAILABLE = "There is already a ship in this range, try again.";
+	static String ERR_MSG_ALREADY_SHOT = "You've already shot here, try again.";
 
 	static String ERR_MSG_SIZE(int size) {
 		return "Please enter exactly " + size + " numbers.";

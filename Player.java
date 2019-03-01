@@ -37,37 +37,51 @@ public class Player {
 		out.println(Constants.FORMAT_MSG_3);
 
 		String input = null;
+		List<Integer> nums = new ArrayList<Integer>();
+		int x = -2;
+		int y = -2;
 		try {
 			while(true) {
 				if((input = in.readLine()) != null) {
-					break;
+					nums = extractInput(input);
+					x = nums.get(0);
+					y = nums.get(1);
+
+					if(!withinBounds(x, y)) {
+						out.println(Constants.ERR_MSG_BOUNDS);
+						out.println();
+					} else if(opponent.shotAlready(x, y)){
+						out.println(Constants.ERR_MSG_ALREADY_SHOT);
+						out.println();
+					} else {
+						break;
+					}
 				}
 			}
 		} catch(IOException io) {
 			System.out.println(io);
 		}
 
-		List<String> list = Arrays.asList(input.split(","));
-		List<Integer> nums = list.stream().map(Integer::parseInt).collect(Collectors.toList());
-
-		if(nums.size() != 2) {
-			out.println(Constants.ERR_MSG_SIZE(2));
-			out.println();
-		} 
-
-		int x = nums.get(0);
-		int y = nums.get(1);
-
-		if(!withinBounds(x, y)) {
-			out.println(Constants.ERR_MSG_BOUNDS);
-			out.println();
+		if(opponent.isAvailable(x, y)){
+			out.println(Constants.MISSED_SHOT_MSG);
+			opponent.updateBoard(x, y, -1);
+			opponent.out.println(Constants.MISSED_SHOT_UPDATE_MSG);
+			opponent.out.println(Constants.DISPLAY_BOARD_MSG);
+			opponent.printBoardUpdate(x,y);
+			opponent.out.println();
 		}
-		// check if this player has already shot at this location
-		// if player hasn't, check if value is 1 or 0.
-		// update the other player's board accordingly
-		// update other player's numAlive and shipToCoordinates map
-		// probably dont need numAlive anymore, now that i'm thinking about it
-		// logic
+		
+		if(opponent.containsShip(x, y)){
+			out.println(Constants.HIT_SHOT_MSG);
+			opponent.updateBoard(x, y, 2);
+			opponent.out.println(Constants.HIT_SHOT_UPDATE_MSG);
+			opponent.out.println(Constants.DISPLAY_BOARD_MSG);
+			opponent.printBoardUpdate(x, y);
+			opponent.out.println();
+			// TODO: update shipToCoordinates map
+			// check if a ship has been destroyed
+		}
+		
 	}
 
 	void updateBoard(int x, int y, int value) {
@@ -190,12 +204,47 @@ public class Player {
 		}
 	}
 
+	void printBoardUpdate(int x, int y) {
+		int rowCount = 0;
+		for(int[] row : this.board) {
+			if(rowCount == x){
+				String[] temp = Arrays.toString(row).split("[\\[\\]]")[1].split(", ");
+				temp[y] = "(" + temp[y] + ")";
+				out.println(Arrays.toString(temp));
+			} else {
+				rowCount++;
+				out.println(Arrays.toString(row));
+			}
+		}
+	}
+
+	List<Integer> extractInput(String input){
+		List<String> list = Arrays.asList(input.split(","));
+		List<Integer> nums = list.stream().map(Integer::parseInt).collect(Collectors.toList());
+
+		if(nums.size() != 2) {
+			out.println(Constants.ERR_MSG_SIZE(2));
+			out.println();
+		} 
+
+		return nums;
+
+	}
+
 	boolean isAvailable(int x, int y) {
 		return board[x][y] == 0;
 	}
 
 	boolean withinBounds(int x, int y) {
 		return x >= 0 && x < Constants.BOARD_SIZE && y >=0 && y < Constants.BOARD_SIZE;
+	}
+
+	boolean shotAlready(int x, int y){
+		return this.board[x][y] == -1;
+	}
+
+	boolean containsShip(int x, int y){
+		return this.board[x][y] == 1;
 	}
 
 	boolean lost() {
