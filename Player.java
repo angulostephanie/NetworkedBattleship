@@ -47,7 +47,7 @@ public class Player {
 					x = nums.get(0);
 					y = nums.get(1);
 
-					if(checkIfInputIsValid(x, y, opponent))
+					if(isInputIsValid(x, y, opponent))
 						break;
 				}
 			}
@@ -77,7 +77,7 @@ public class Player {
 		
 	}
 
-	boolean checkIfInputIsValid(int x, int y, Player opponent){
+	boolean isInputIsValid(int x, int y, Player opponent){
 		if(!withinBounds(x, y)) {
 			out.println(Constants.ERR_MSG_BOUNDS);
 			out.println();
