@@ -47,15 +47,8 @@ public class Player {
 					x = nums.get(0);
 					y = nums.get(1);
 
-					if(!withinBounds(x, y)) {
-						out.println(Constants.ERR_MSG_BOUNDS);
-						out.println();
-					} else if(opponent.shotAlready(x, y)){
-						out.println(Constants.ERR_MSG_ALREADY_SHOT);
-						out.println();
-					} else {
+					if(checkIfInputIsValid(x, y, opponent))
 						break;
-					}
 				}
 			}
 		} catch(IOException io) {
@@ -82,6 +75,20 @@ public class Player {
 			// check if a ship has been destroyed
 		}
 		
+	}
+
+	boolean checkIfInputIsValid(int x, int y, Player opponent){
+		if(!withinBounds(x, y)) {
+			out.println(Constants.ERR_MSG_BOUNDS);
+			out.println();
+			return false;
+		} else if(opponent.shotAlready(x, y)){
+			out.println(Constants.ERR_MSG_ALREADY_SHOT);
+			out.println();
+			return false;
+		} else {
+			return true;
+		}
 	}
 
 	void updateBoard(int x, int y, int value) {
@@ -207,14 +214,15 @@ public class Player {
 	void printBoardUpdate(int x, int y) {
 		int rowCount = 0;
 		for(int[] row : this.board) {
-			if(rowCount == x){
-				String[] temp = Arrays.toString(row).split("[\\[\\]]")[1].split(", ");
+			String[] temp = Arrays.toString(row).split("[\\[\\]]")[1].split(", ");
+
+			if(rowCount == x)
 				temp[y] = "(" + temp[y] + ")";
-				out.println(Arrays.toString(temp));
-			} else {
-				rowCount++;
-				out.println(Arrays.toString(row));
-			}
+			else 
+				temp[y] = " " + temp[y] + " ";
+			
+			out.println(Arrays.toString(temp));
+			rowCount++;
 		}
 	}
 
