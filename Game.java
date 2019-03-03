@@ -17,21 +17,31 @@ public class Game {
 
 		setUpShips(player1, player2);
 
-		boolean gameOver = player1.lost() || player1.lost();
+		boolean gameOver = false;
 
-		while(!gameOver) {
-			try{
-			broadcastMSG(player2, Constants.OTHER_PLAYER_TURN_MSG(1));
-			player1.takeTurn(player2);
-			Thread.sleep(1000);
-			if(gameOver) break; // add logic who won after while loop
-			broadcastMSG(player1, Constants.OTHER_PLAYER_TURN_MSG(2));
-			player2.takeTurn(player1);
-			Thread.sleep(1000);
+		 do {
+			try {
+				broadcastMSG(player2, Constants.OTHER_PLAYER_TURN_MSG(1));
+				gameOver = player1.takeTurn(player2);
+				Thread.sleep(1000);
+				if(gameOver) {
+					// all done
+					System.out.println();
+					System.out.println("--------------");
+					System.out.println("GAME OVER");
+					System.out.println("--------------");
+					System.out.println();
+					// only prints to server
+					// add messaging to players
+					break; 
+				}
+				broadcastMSG(player1, Constants.OTHER_PLAYER_TURN_MSG(2));
+				gameOver = player2.takeTurn(player1);
+				Thread.sleep(1000);
 			} catch(InterruptedException ie){
 				System.out.println(ie);
 			}
-		}
+		} while(!gameOver);
 
 	}
 	

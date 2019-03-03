@@ -24,9 +24,17 @@ public class Constants {
 	static String MISSED_SHOT_UPDATE_MSG = "Phew! Your opponent shot and missed.";
 	static String HIT_SHOT_MSG = "You hit a ship!";
 	static String HIT_SHOT_UPDATE_MSG = "Agh! You've been hit by your opponent.";
-	
-	static String ADD_SHIP_MSG(int distance) {
-		return "Just added a ship of unit size " + (distance) + ".";
+
+	static String ADD_SHIP_MSG(int size) {
+		return "Just added a ship of unit size [" + (size) + "].";
+	}
+
+	static String SHIP_DEAD_MSG_1(int size) {
+		return "Oh no! Your ship of unit size [" + (size) + "] has sunken. :(";
+	}
+
+	static String SHIP_DEAD_MSG_2(int size) {
+		return "Congrats! You have sunken your opponent's ship of unit size [" + (size) + "].";
 	}
 
 	static String OTHER_PLAYER_TURN_MSG(int playerNum){

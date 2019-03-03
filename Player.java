@@ -27,35 +27,38 @@ public class Player {
 			this.coordinatesToShipType = new HashMap<String, Integer>();
 			this.numAlive = 0;
 			
-		} catch (IOException io){
+		} catch (IOException io) {
 			System.out.println(io);
 		}
 	}
 	
-	void takeTurn(Player opponent) {
+	boolean takeTurn(Player opponent) {
 		out.println(Constants.YOUR_TURN_MSG);
 		out.println(Constants.FORMAT_MSG_3);
 
 		String input = null;
 		List<Integer> nums = new ArrayList<Integer>();
+
 		int x = -2;
 		int y = -2;
+
 		try {
 			while(true) {
 				if((input = in.readLine()) != null) {
-					nums = extractInput(input);
+					nums = extractInput(input, 2);
 					x = nums.get(0);
 					y = nums.get(1);
 
-					if(isInputIsValid(x, y, opponent))
+					if(isInputValid(x, y, opponent))
 						break;
+					// TODO: add option for player to view their board at their leisure? i.e. when input = "b"
 				}
 			}
 		} catch(IOException io) {
 			System.out.println(io);
 		}
 
-		if(opponent.isAvailable(x, y)){
+		if(opponent.isAvailable(x, y)) {
 			out.println(Constants.MISSED_SHOT_MSG);
 			opponent.updateBoard(x, y, -1);
 			opponent.out.println(Constants.MISSED_SHOT_UPDATE_MSG);
@@ -64,36 +67,42 @@ public class Player {
 			opponent.out.println();
 		}
 		
-		if(opponent.containsShip(x, y)){
+		if(opponent.containsShip(x, y)) {
 			out.println(Constants.HIT_SHOT_MSG);
+
 			opponent.updateBoard(x, y, 2);
 			opponent.out.println(Constants.HIT_SHOT_UPDATE_MSG);
 			opponent.out.println(Constants.DISPLAY_BOARD_MSG);
 			opponent.printBoardUpdate(x, y);
-			opponent.out.println();
-			// TODO: update shipToCoordinates map
-			// check if a ship has been destroyed
+			opponent.out.println("Before " + opponent.numAlive);
+			opponent.numAlive--;
+			opponent.out.println("You now have " + opponent.numAlive + " coordinates alive.");
+
+			String xy = x + "," + y;
+			int shipType = opponent.coordinatesToShipType.get(x + "," + y);
+			ArrayList<String> coordinatesList = opponent.shipToCoordinates.get(shipType);
+
+			// Remove coordinates from both of opponent's maps
+			//  - Remove entire key-value pair
+			opponent.coordinatesToShipType.remove(xy); 
+
+			// - Update value (coordinate list)
+			coordinatesList.remove(xy);
+			opponent.shipToCoordinates.put(shipType, coordinatesList); 
+			
+			if(coordinatesList.isEmpty()) {
+				opponent.out.println(Constants.SHIP_DEAD_MSG_1(shipType));
+				out.println(Constants.SHIP_DEAD_MSG_2(shipType));
+			}
+
+			if(opponent.lost()) {
+				// GAME OVER
+				return true;
+			}
 		}
-		
+		return false;
 	}
 
-	boolean isInputIsValid(int x, int y, Player opponent){
-		if(!withinBounds(x, y)) {
-			out.println(Constants.ERR_MSG_BOUNDS);
-			out.println();
-			return false;
-		} else if(opponent.shotAlready(x, y)){
-			out.println(Constants.ERR_MSG_ALREADY_SHOT);
-			out.println();
-			return false;
-		} else {
-			return true;
-		}
-	}
-
-	void updateBoard(int x, int y, int value) {
-		this.board[x][y] = value;
-	}
 	boolean addShip() {
 		out.println(Constants.FORMAT_MSG_1);
 		out.println(Constants.FORMAT_MSG_2);
@@ -110,8 +119,7 @@ public class Player {
 		}
 
 
-		List<String> list = Arrays.asList(input.split(","));
-		List<Integer> nums = list.stream().map(Integer::parseInt).collect(Collectors.toList());
+		List<Integer> nums = extractInput(input, 4);
 
 		if(nums.size() != 4) {
 			out.println(Constants.ERR_MSG_SIZE(4));
@@ -173,11 +181,15 @@ public class Player {
 			if(isHorizontal && isAvailable(c, i)) {
 				this.board[c][i] = Constants.SHIP_POS;
 				this.numAlive++;
-				coordinates.add(c + "," + i);
+				String xy = c + "," + i;
+				coordinates.add(xy);
+				coordinatesToShipType.put(xy, distance);
 			} else if(isVertical && isAvailable(i, c)) {
 				this.board[i][c] = Constants.SHIP_POS;
 				this.numAlive++;
-				coordinates.add(i + "," + c);
+				String xy = i + "," + c;
+				coordinates.add(xy);
+				coordinatesToShipType.put(xy, distance);
 			}
 		} 
 		
@@ -226,17 +238,34 @@ public class Player {
 		}
 	}
 
-	List<Integer> extractInput(String input){
+	void updateBoard(int x, int y, int value) {
+		this.board[x][y] = value;
+	}
+
+	List<Integer> extractInput(String input, int size) {
 		List<String> list = Arrays.asList(input.split(","));
 		List<Integer> nums = list.stream().map(Integer::parseInt).collect(Collectors.toList());
 
-		if(nums.size() != 2) {
-			out.println(Constants.ERR_MSG_SIZE(2));
+		if(nums.size() != size) {
+			out.println(Constants.ERR_MSG_SIZE(size));
 			out.println();
 		} 
 
 		return nums;
 
+	}
+
+	boolean isInputValid(int x, int y, Player opponent){
+		if(!withinBounds(x, y)) {
+			out.println(Constants.ERR_MSG_BOUNDS);
+			out.println();
+			return false;
+		} else if(opponent.shotAlready(x, y)){
+			out.println(Constants.ERR_MSG_ALREADY_SHOT);
+			out.println();
+			return false;
+		} 
+		return true;
 	}
 
 	boolean isAvailable(int x, int y) {
@@ -248,7 +277,7 @@ public class Player {
 	}
 
 	boolean shotAlready(int x, int y){
-		return this.board[x][y] == -1;
+		return this.board[x][y] == -1 || this.board[x][y] == 2;
 	}
 
 	boolean containsShip(int x, int y){
