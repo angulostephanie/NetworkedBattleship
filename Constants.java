@@ -25,7 +25,7 @@ public class Constants {
 	static String HIT_SHOT_MSG = "You hit a ship!";
 	static String HIT_SHOT_UPDATE_MSG = "Agh! You've been hit by your opponent.";
 	static String WINNER_MSG = "Congrats, you won!! :)";
-	static String GAME_OVER_MSG = " ---------------- \n|   GAME OVER   | \n ---------------- ";
+	static String GAME_OVER_MSG = " --------------- \n|   GAME OVER   | \n --------------- ";
 
 	static String ADD_SHIP_MSG(int size) {
 		return "Just added a ship of unit size [" + (size) + "].";
@@ -48,7 +48,7 @@ public class Constants {
 		if(player1) {
 			player = " Player 1 "; 
 		}
-		return "Sorry you lost," + "won! Better luck next time. :/";
+		return "Sorry YOU lost," + player + " won! Better luck next time. :/";
 	}
 
 	// Error Messages

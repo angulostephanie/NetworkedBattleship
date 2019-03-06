@@ -64,7 +64,7 @@ public class BattleshipServer {
             }
 
         } catch (IOException e) {
-            System.out.println("Exception caught when trying to listen on port " + port + " or listening for a connection");
+            System.out.println("Exception caught when trying to listen on port " + portNumber + " or listening for a connection");
             System.out.println(e.getMessage());
         }
     }
