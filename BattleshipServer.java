@@ -17,7 +17,7 @@ public class BattleshipServer {
             ServerSocket serverSocket =
                 new ServerSocket(portNumber); 
         ) {
-            System.out.println("starting");
+            System.out.println("Starting");
             while(true) { 
                 Socket client = serverSocket.accept(); 
                 System.out.println("A player has joined! INFO: " + client);
@@ -37,8 +37,6 @@ public class BattleshipServer {
                             if(!rooms.containsKey(room)) {
                                 players = new ArrayList<>();
                                 rooms.put(room, players);
-                                System.out.println("HELLO");
-                                System.out.println("hi ~" + players.size());
                                 break;
                             } else if(rooms.get(room).size() < 2) {
                                 break;
@@ -66,7 +64,7 @@ public class BattleshipServer {
             }
 
         } catch (IOException e) {
-            System.out.println("Exception caught when trying to listen on port 12345 or listening for a connection");
+            System.out.println("Exception caught when trying to listen on port " + port + " or listening for a connection");
             System.out.println(e.getMessage());
         }
     }
