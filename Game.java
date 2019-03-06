@@ -2,7 +2,7 @@ import java.io.IOException;
 import java.net.*;
 import java.util.Arrays; 
 
-public class Game {
+public class Game extends Thread {
 	Player player1;
 	Player player2;
 
@@ -11,7 +11,7 @@ public class Game {
 		this.player2 = new Player(socket2);
 	}
 
-	void start() {
+	public void run() {
 		player1.out.println(Constants.WELCOME_MSG);
 		player2.out.println(Constants.WELCOME_MSG);
 

@@ -7,17 +7,18 @@ import java.io.*;
 
 public class BattleshipClient {
 	public static void main(String[] args) throws IOException {
-		if (args.length != 1) {
+		if (args.length != 2) {
             System.err.println(
-                "Usage: java BattleshipClient <host name> ");
+                "Usage: java BattleshipClient <host name> <port number> ");
             System.exit(1);
         }
 		
 		String hostName = args[0]; 
+        int portNumber = Integer.parseInt(args[1]);
 
 		try {
             String userInput;
-            Socket socket = new Socket(hostName, 12345); 
+            Socket socket = new Socket(hostName, portNumber); 
             PrintWriter out =
                     new PrintWriter(socket.getOutputStream(), true); 
                 BufferedReader stdIn =
@@ -27,6 +28,7 @@ public class BattleshipClient {
             ServerListener listener = new ServerListener(socket);
             listener.start();
             System.out.println("Welcome to a game of Battleship!");
+            System.out.println("Please enter a chatroom to be a part of!");
 
             while((userInput = stdIn.readLine()) != null){
                 out.println(userInput);
