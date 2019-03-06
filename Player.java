@@ -46,11 +46,17 @@ public class Player {
 			while(true) {
 				if((input = in.readLine()) != null) {
 					nums = extractInput(input, 2);
-					x = nums.get(0);
-					y = nums.get(1);
+					if(nums.size() == 2) {
+						x = nums.get(0);
+						y = nums.get(1);
 
-					if(isInputValid(x, y, opponent))
-						break;
+						if(isInputValid(x, y, opponent))
+							break;
+					} else {
+						out.println(Constants.ERR_MSG_INVALID);
+						out.println();
+					}
+					
 					// TODO: add option for player to view their board at their leisure? i.e. when input = "b"
 				}
 			}
@@ -62,6 +68,7 @@ public class Player {
 			out.println(Constants.MISSED_SHOT_MSG);
 			opponent.updateBoard(x, y, -1);
 			opponent.out.println(Constants.MISSED_SHOT_UPDATE_MSG);
+			out.println();
 			opponent.out.println(Constants.DISPLAY_BOARD_MSG);
 			opponent.printBoardUpdate(x,y);
 			opponent.out.println();
@@ -69,12 +76,12 @@ public class Player {
 		
 		if(opponent.containsShip(x, y)) {
 			out.println(Constants.HIT_SHOT_MSG);
-
+			out.println();
 			opponent.updateBoard(x, y, 2);
 			opponent.out.println(Constants.HIT_SHOT_UPDATE_MSG);
+			opponent.out.println();
 			opponent.out.println(Constants.DISPLAY_BOARD_MSG);
 			opponent.printBoardUpdate(x, y);
-			opponent.out.println("Before " + opponent.numAlive);
 			opponent.numAlive--;
 			opponent.out.println("You now have " + opponent.numAlive + " coordinates alive.");
 
@@ -93,6 +100,7 @@ public class Player {
 			if(coordinatesList.isEmpty()) {
 				opponent.out.println(Constants.SHIP_DEAD_MSG_1(shipType));
 				out.println(Constants.SHIP_DEAD_MSG_2(shipType));
+				out.println();
 			}
 
 			if(opponent.lost()) {
@@ -100,6 +108,7 @@ public class Player {
 				return true;
 			}
 		}
+		
 		return false;
 	}
 
@@ -121,7 +130,11 @@ public class Player {
 
 		List<Integer> nums = extractInput(input, 4);
 
-		if(nums.size() != 4) {
+		if(nums.size() == 0) {
+			out.println(Constants.ERR_MSG_INVALID);
+			out.println();
+			return false;
+		} else if(nums.size() != 4) {
 			out.println(Constants.ERR_MSG_SIZE(4));
 			out.println();
 			return false;
@@ -244,15 +257,14 @@ public class Player {
 
 	List<Integer> extractInput(String input, int size) {
 		List<String> list = Arrays.asList(input.split(","));
-		List<Integer> nums = list.stream().map(Integer::parseInt).collect(Collectors.toList());
-
-		if(nums.size() != size) {
-			out.println(Constants.ERR_MSG_SIZE(size));
-			out.println();
-		} 
+		List<Integer> nums = new ArrayList<Integer>();
+		try {
+			nums = list.stream().map(Integer::parseInt).collect(Collectors.toList());
+		} catch(NumberFormatException n) {
+			System.out.println("not numbers");
+		}
 
 		return nums;
-
 	}
 
 	boolean isInputValid(int x, int y, Player opponent){

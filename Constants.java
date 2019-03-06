@@ -24,6 +24,8 @@ public class Constants {
 	static String MISSED_SHOT_UPDATE_MSG = "Phew! Your opponent shot and missed.";
 	static String HIT_SHOT_MSG = "You hit a ship!";
 	static String HIT_SHOT_UPDATE_MSG = "Agh! You've been hit by your opponent.";
+	static String WINNER_MSG = "Congrats, you won!! :)";
+	static String GAME_OVER_MSG = " ---------------- \n|   GAME OVER   | \n ---------------- ";
 
 	static String ADD_SHIP_MSG(int size) {
 		return "Just added a ship of unit size [" + (size) + "].";
@@ -41,12 +43,21 @@ public class Constants {
 		return "It is Player " + (playerNum) + "'s turn. Please wait...";
 	}
 
+	static String LOSER_MSG(boolean player1) {
+		String player = " Player 2 ";
+		if(player1) {
+			player = " Player 1 "; 
+		}
+		return "Sorry you lost," + "won! Better luck next time. :/";
+	}
+
 	// Error Messages
 	static String ERR_MSG_BOUNDS = "The entered coordinates are out of bounds, try again.";
 	static String ERR_MSG_ORIENTATION = "Ships must be either horizontal or vertical, try again.";
 	static String ERR_MSG_LENGTH = "Ship must be within 2 - 4 units long, try again";
 	static String ERR_MSG_UNAVAILABLE = "There is already a ship in this range, try again.";
 	static String ERR_MSG_ALREADY_SHOT = "You've already shot here, try again.";
+	static String ERR_MSG_INVALID = "Please enter in something of valid format.";
 
 	static String ERR_MSG_SIZE(int size) {
 		return "Please enter exactly " + size + " numbers.";

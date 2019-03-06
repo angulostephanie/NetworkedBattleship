@@ -18,6 +18,7 @@ public class Game {
 		setUpShips(player1, player2);
 
 		boolean gameOver = false;
+		boolean player1Won = true;
 
 		 do {
 			try {
@@ -25,14 +26,11 @@ public class Game {
 				gameOver = player1.takeTurn(player2);
 				Thread.sleep(1000);
 				if(gameOver) {
-					// all done
-					System.out.println();
-					System.out.println("--------------");
-					System.out.println("GAME OVER");
-					System.out.println("--------------");
-					System.out.println();
-					// only prints to server
-					// add messaging to players
+					player1Won = true;
+					player1.out.println(Constants.WINNER_MSG);
+					player1.out.println(Constants.GAME_OVER_MSG);
+					player2.out.println(Constants.LOSER_MSG(player1Won));
+					player2.out.println(Constants.GAME_OVER_MSG);
 					break; 
 				}
 				broadcastMSG(player1, Constants.OTHER_PLAYER_TURN_MSG(2));
@@ -42,6 +40,13 @@ public class Game {
 				System.out.println(ie);
 			}
 		} while(!gameOver);
+
+		if(!player1Won) {
+			player2.out.println(Constants.WINNER_MSG);
+			player2.out.println(Constants.GAME_OVER_MSG);
+			player1.out.println(Constants.LOSER_MSG(player1Won));
+			player1.out.println(Constants.GAME_OVER_MSG);
+		}
 
 	}
 	
